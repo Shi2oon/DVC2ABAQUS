@@ -1,0 +1,51 @@
+function runBCJob(folder)
+PWD = pwd;
+cd(folder);
+fileid = [folder, '\Abaqus_script_2.py'];
+fileID = fopen(fileid,'w');
+fprintf(fileID,'from __future__ import division  \n');
+fprintf(fileID,'from abaqus import * \n');
+fprintf(fileID,'from abaqusConstants import * \n');
+fprintf(fileID,'from part import * \n');
+fprintf(fileID,'from material import * \n');
+fprintf(fileID,'from section import * \n');
+fprintf(fileID,'from assembly import * \n');
+fprintf(fileID,'from step import * \n');
+fprintf(fileID,'from interaction import * \n');
+fprintf(fileID,'from load import * \n');
+fprintf(fileID,'from mesh import * \n');
+fprintf(fileID,'from optimization import * \n');
+fprintf(fileID,'from job import * \n');
+fprintf(fileID,'from sketch import * \n');
+fprintf(fileID,'from visualization import * \n');
+fprintf(fileID,'from connectorBehavior import * \n');
+fprintf(fileID,'from odbAccess import * \n');
+fprintf(fileID,'import regionToolset\n');
+fprintf(fileID,'import displayGroupMdbToolset as dgm\n');
+fprintf(fileID,'import xyPlot\n');
+fprintf(fileID,'import displayGroupOdbToolset as dgo\n');
+fprintf(fileID,'import connectorBehavior\n');
+fprintf(fileID,'from operator import itemgetter \n');
+fprintf(fileID,'from math import ceil \n');
+fprintf(fileID,'import numpy  as np \n');
+fprintf(fileID,'import os \n');
+FoldrOut = pythonFileName(folder);
+fprintf(fileID,'os.chdir(r"%s");\n',FoldrOut);
+fprintf(fileID,'mdb.JobFromInputFile(name="CrackedModel_BC", \n');
+FoldrOut = pythonFileName([folder '\CrackedModel_BC.inp']);
+fprintf(fileID,'    inputFileName="%s", \n',FoldrOut);
+fprintf(fileID,'    type=ANALYSIS, atTime=None, waitMinutes=0, waitHours=0, queue=None, \n');
+fprintf(fileID,'    memory=90, memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True, \n');
+fprintf(fileID,'    explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, \n');
+fprintf(fileID,'    userSubroutine="", scratch="", resultsFormat=ODB, \n');
+fprintf(fileID,'    multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)\n');
+fprintf(fileID,'mdb.jobs["CrackedModel_BC"].submit(consistencyChecking=OFF)\n');
+system(['abaqus cae ','noGUI','=Abaqus_script_2.py']); % Windows system
+cd(PWD)
+delete([folder '\CrackedModel_BC.log']);
+delete([folder '\CrackedModel_BC.msg']);
+delete([folder '\CrackedModel_BC.prt']);
+delete([folder '\CrackedModel_BC.sim']);
+delete([folder '\CrackedModel_BC.sta']);
+delete([folder '\CrackedModel_BC.com']);
+end
