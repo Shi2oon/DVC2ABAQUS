@@ -1,5 +1,5 @@
-function [offset,RadEulerAng,rotCentre,Abaqus,Len] = DVC2J(inO,Dir)
-if strcmpi(Dir.Operation, 'DIC')
+function [offset,RadEulerAng,rotCentre,Abaqus,Len] = DVC2J(Dir)
+if strcmpi(Dir.Operation, 'DIC') || strcmpi(Dir.Operation, 'DVC')
     [~,A] = fileparts(Dir.results);
     if contains(A,'3D_Integrated_Uxy')
         datum = load([erase(Dir.results,'.mat')  '.mat']);
@@ -20,7 +20,7 @@ if strcmpi(Dir.Operation, 'DIC')
 %         datum = datum(:,1:6);
 %     end
     datum = datum.*Dir.pixel_size;
-    inO = fileparts(inO);
+    inO = fileparts(Dir.results);
 else 
 %     [~,Dir.M4] = reshapeData(datum);
 %     Dir.M4.X = Dir.M4.X1;   Dir.M4.Y = Dir.M4.Y1;   Dir.M4.Z = Dir.M4.Z1;else
@@ -44,7 +44,6 @@ Len = [min(Dir.M4.X(:))     max(Dir.M4.X(:));   % X dim
 Len = round(Len,3);
 Dir.M4.X = abs(Dir.M4.X-max(Dir.M4.X(:)));
 [~,~, offset] = unist4Abaqus([],Dir.input_unit);
-inO = [fileparts(inO) '\' Dir.unique];               mkdir(inO);
 saveas(gcf, [inO '\DVC2ABAQUS Coodrinate.png']); close
 
 %% create DVC .dat folder
@@ -66,7 +65,7 @@ fprintf(inpFile, '%f %f %f %f %f %f %f\n',[Dir.M4.X(:)';Dir.M4.Y(:)';...
         Dir.M4.Z(:)'-min(unique(Dir.M4.Z(:)));Dir.M4.Ux(:)';Dir.M4.Uy(:)';...
         Dir.M4.Uz(:)';~isnan(Dir.M4.X(:))']);
 fclose(inpFile);
-%{
+%
 try
 % remove rotation
 [RadEulerAng,rotCentre,tmp] = shoemake_3D_v04_07_02_Abdo...
@@ -87,7 +86,6 @@ catch err
     RadEulerAng =[];    rotCentre = [];
 end
 %}
-RadEulerAng =[];        rotCentre = [];
 %%
 Greate3DCracked_v2(inO,round(Len,4),Dir,offset);  % Create a 3D crack in abaqus 
 Abaqus = DVC_Part(inO);      % Merge the gotery with the boundray condtions
