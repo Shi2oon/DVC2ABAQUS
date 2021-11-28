@@ -5,8 +5,8 @@ inData(:,3) = inData(:,3) - min(inData(:,3));
 
 [ ~,dataum ] = reshapeData( inData );
 U = (dataum.Uz(:,:,1));%.^2+dataum.Ux(:,:,1).^2+dataum.Uz(:,:,1).^2).^0.5;
-imagesc(dataum.X1(1,:,1),dataum.Y1(:,1,1),U)%.^2+...
-%         dataum.Uy(:,:,1).^2+dataum.Uz(:,:,1).^2).^0.5);
+imagesc(dataum.X1(1,:,1),dataum.Y1(:,1,1),(dataum.Ux(:,:,1).^2+...
+        dataum.Uy(:,:,1).^2+dataum.Uz(:,:,1).^2).^0.5);
 c=colorbar; c.Label.String = ['U_y'];
 set(gca,'Ydir','normal');	axis image;colormap jet
 title('Answer in the command line');

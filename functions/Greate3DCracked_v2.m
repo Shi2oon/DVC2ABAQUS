@@ -162,6 +162,12 @@ elseif A.type == 'R'
     A.E = A.E*offset^2;       A.yield = A.yield*offset^2;
     fprintf(fileID,'	mdb.models["Model-1"].materials["Cracked"].DeformationPlasticity(table=((%f,  \n', A.E);
     fprintf(fileID,'		%f, %f, %f, %f), )) \n',A.nu,A.yield,A.Exponent, A.Yield_offset);
+elseif A.type == 'M'
+    A.E = A.E*offset^2;
+    A.G = A.G*offset^2;
+    fprintf(fileID,'mdb.models["Model-1"].materials["Cracked"].Elastic(table=((%f, %f , \n', A.E(1),A.E(2));
+    fprintf(fileID,' %f,  %f,  %f,  %f, %f,  %f,  %f), ), type=ENGINEERING_CONSTANTS) \n', ...
+        A.E(3), A.nu(1), A.nu(2), A.nu(3), A.G(1), A.G(2), A.G(3));
 end
 
 fprintf(fileID,'mdb.models["Model-1"].HomogeneousSolidSection(material="Cracked", name=\n');
