@@ -65,7 +65,8 @@ fprintf(inpFile, '%f %f %f %f %f %f %f\n',[Dir.M4.X(:)';Dir.M4.Y(:)';...
         Dir.M4.Z(:)'-min(unique(Dir.M4.Z(:)));Dir.M4.Ux(:)';Dir.M4.Uy(:)';...
         Dir.M4.Uz(:)';~isnan(Dir.M4.X(:))']);
 fclose(inpFile);
-%
+RadEulerAng =[];    rotCentre = [];
+%{
 try
 % remove rotation
 [RadEulerAng,rotCentre,tmp] = shoemake_3D_v04_07_02_Abdo...
@@ -83,9 +84,9 @@ fprintf(inpFile, '%f %f %f %f %f %f %f\n',[dataum.X1(:)';dataum.Y1(:)';...
 fclose(inpFile);
 catch err
     warning(['Rotation Removal failed because ' err.message])
-    RadEulerAng =[];    rotCentre = [];
 end
 %}
+
 %%
 Greate3DCracked_v2(inO,round(Len,4),Dir,offset);  % Create a 3D crack in abaqus 
 Abaqus = DVC_Part(inO);      % Merge the gotery with the boundray condtions

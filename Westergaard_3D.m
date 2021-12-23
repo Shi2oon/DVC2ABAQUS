@@ -5,9 +5,9 @@ if ~exist('Mode','var');        Mode = 'I';         end
 if isempty(Mode);               Mode = 'I';         end
 
 if exist('file2','var')
-    newfile = fullfile(file2, [num2str(StressIntensityFactor) '_' Mode ' WS']);
+    newfile = fullfile(file2, [num2str(StressIntensityFactor(1)) '_' Mode ' WS']);
 else
-    newfile = [ pwd '\3D_' num2str(StressIntensityFactor) '_' Mode ' WS']; 
+    newfile = [ pwd '\3D_' num2str(StressIntensityFactor(1)) '_' Mode ' WS']; 
 end
 mkdir(newfile);
 
@@ -25,7 +25,7 @@ vec = minGrid : gridStep : maxGrid; % m
 [x,y,z] = meshgrid(vec,vec,vec); % m
 % StressIntensityFactor = 30; % [MPa m^0.5]
 fprintf('preparing synthetic Westergaard Solution Data .. ');
-K = StressIntensityFactor * 1E6; % Stress intensity factor [Pa m^0.5]
+K = StressIntensityFactor.* 1E6; % Stress intensity factor [Pa m^0.5]
 E = 210E9; % Young's Modulus [Pa]
 nu = 0.3; % poisson ratio
 mu = E/(2.*(1+nu)); % Shear Modulus [Pa]
@@ -52,13 +52,22 @@ switch Mode
         uz = (2*K./mu).*sqrt(r/(2*pi)).*sin(theta/2); % Anderson p99 A2.44b
         ux = zeros(size(uz)); % Anderson p99 A2.44a
         uy = zeros(size(uz)); % Anderson p99 A2.44a
-    case 'fun'
-        ux = ((K./(2.*mu)).*sqrt(r/(2*pi)).*cos(theta/2).*(kappa - 1 + 2.*(sin(theta/2)).^2)...
-             +(K./(2.*mu)).*sqrt(r/(2*pi)).*sin(theta/2).*(kappa + 1 + 2.*(cos(theta/2)).^2))./3; 
-        uy = ((K./(2.*mu)).*sqrt(r/(2*pi)).*sin(theta/2).*(kappa + 1 -  2.*(cos(theta/2)).^2)...
-             +(K./(2.*mu)).*sqrt(r/(2*pi)).*cos(theta/2).*(kappa - 1 - 2.*(sin(theta/2)).^2))./3;  
-        uz = (2*K./mu).*sqrt(r/(2*pi)).*sin(theta/2)./3;
-        
+    case 'fun' % Anderson p99 A2.44a
+%         ux =  ((K(1)./(2.*mu)).*sqrt(r/(2*pi)).*cos(theta/2).*(kappa - 1 + 2.*(sin(theta/2)).^2)...
+%               +(K(2)./(2.*mu)).*sqrt(r/(2*pi)).*sin(theta/2).*(kappa + 1 + 2.*(cos(theta/2)).^2)); 
+%         uy =  ((K(1)./(2.*mu)).*sqrt(r/(2*pi)).*sin(theta/2).*(kappa + 1 - 2.*(cos(theta/2)).^2)...
+%               +(K(2)./(2.*mu)).*sqrt(r/(2*pi)).*cos(theta/2).*(kappa - 1 - 2.*(sin(theta/2)).^2));  
+%         uz = (2*K(3)./mu).*sqrt(r/(2*pi)).*sin(theta/2);
+%         ux = (0.5*K(1)/mu*sqrt(r/(2*pi)).*(+cos(theta/2).*(kappa-cos(theta)))+...
+%               0.5*K(2)/mu*sqrt(r/(2*pi)).*(+sin(theta/2).*(kappa+2+cos(theta)))); 
+%         uy = (0.5*K(1)/mu*sqrt(r/(2*pi)).*(+sin(theta/2).*(kappa-cos(theta)))+...
+%               0.5*K(2)/mu*sqrt(r/(2*pi)).*(-cos(theta/2).*(kappa-2+cos(theta))));  
+%         uz =   (2*K(3)/mu*sqrt(r/(2*pi)).*sin(theta/2));   
+        ux = (K(1)./(2.*mu)).*sqrt(r/(2*pi)).*cos(theta/2).*(kappa - 1 + 2.*(sin(theta/2)).^2)+...
+             (K(2)./(2.*mu)).*sqrt(r/(2*pi)).*sin(theta/2).*(kappa + 1 + 2.*(cos(theta/2)).^2);
+        uy = (K(1)./(2.*mu)).*sqrt(r/(2*pi)).*sin(theta/2).*(kappa + 1 - 2.*(cos(theta/2)).^2)+...
+             (K(2)./(2.*mu)).*sqrt(r/(2*pi)).*cos(theta/2).*(kappa - 1 - 2.*(sin(theta/2)).^2); % Anderson p99 A2.44b
+        uz = (2*K(3)./mu).*sqrt(r/(2*pi)).*sin(theta/2); % Anderson p99 A2.44b
 end
 plotAllDis(x,y,z,ux,uy,uz,'m')
 saveas(gcf, [newfile '\' Mode '_Disp_fields.tiff']);   
@@ -72,27 +81,27 @@ saveas(gcf, [newfile '\' Mode '_Disp_Mag.fig']); close
     Operation{1,1} = 'DVC';               unit{1,1}  = 'm';
     alldata = [x(:) y(:) z(:) ux(:) uy(:) uz(:)]; % m
     if exist('stPs','var')
-        files{1,1} = [newfile '\' num2str(StressIntensityFactor) 'MPa_m_DISP_' num2str(stPs) '.mat'];
+        files{1,1} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_m_DISP_' num2str(stPs) '.mat'];
     else
-        files{1,1} = [newfile '\' num2str(StressIntensityFactor) 'MPa_m_DISP.mat'];
+        files{1,1} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_m_DISP.mat'];
     end
     save(files{1,1},'alldata')
     
     Operation{1,2} = 'DVC';               unit{1,2}  = 'mm';
     alldata = [x(:) y(:) z(:) ux(:) uy(:) uz(:)].*1e3; % mm
     if exist('stPs','var')
-        files{1,2} = [newfile '\' num2str(StressIntensityFactor) 'MPa_mm_DISP_' num2str(stPs) '.mat'];
+        files{1,2} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_mm_DISP_' num2str(stPs) '.mat'];
     else
-        files{1,2} = [newfile '\' num2str(StressIntensityFactor) 'MPa_mm_DISP.mat'];
+        files{1,2} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_mm_DISP.mat'];
     end
     save(files{1,2},'alldata')
     
     Operation{1,3} = 'DVC';               unit{1,3}  = 'um';
     alldata = [x(:) y(:) z(:) ux(:) uy(:) uz(:)].*1e6; % um
     if exist('stPs','var')
-        files{1,3} = [newfile '\' num2str(StressIntensityFactor) 'MPa_um_DISP_' num2str(stPs) '.mat'];
+        files{1,3} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_um_DISP_' num2str(stPs) '.mat'];
     else
-        files{1,3} = [newfile '\' num2str(StressIntensityFactor) 'MPa_um_DISP.mat'];
+        files{1,3} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_um_DISP.mat'];
     end
     save(files{1,3},'alldata')
 
@@ -111,27 +120,27 @@ saveas(gcf, [newfile '\' Mode '_Disp_Mag.fig']); close
     Operation{2,1} = 'Str';               unit{2,1}  = 'm';
     alldata = [x(:) y(:) z(:) exx(:) eyy(:) ezz(:) exy(:) exz(:) eyz(:)]; % m
     if exist('stPs','var')
-        files{2,1} = [newfile '\' num2str(StressIntensityFactor) 'MPa_m_Strain_' num2str(stPs) '.mat'];
+        files{2,1} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_m_Strain_' num2str(stPs) '.mat'];
     else
-        files{2,1} = [newfile '\' num2str(StressIntensityFactor) 'MPa_m_Strain.mat'];
+        files{2,1} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_m_Strain.mat'];
     end
     save(files{2,1},'alldata')
     
     Operation{2,2} = 'Str';               unit{2,2}  = 'mm';
     alldata = [x(:).*1e3 y(:).*1e3 z(:).*1e3 exx(:) eyy(:) ezz(:) exy(:) exz(:) eyz(:)]; % mm
     if exist('stPs','var')
-        files{2,2} = [newfile '\' num2str(StressIntensityFactor) 'MPa_mm_Strain_' num2str(stPs) '.mat'];
+        files{2,2} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_mm_Strain_' num2str(stPs) '.mat'];
     else
-        files{2,2} = [newfile '\' num2str(StressIntensityFactor) 'MPa_mm_Strain.mat'];
+        files{2,2} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_mm_Strain.mat'];
     end
     save(files{2,2},'alldata')
     
     Operation{2,3} = 'Str';               unit{2,3}  = 'um';
     alldata = [x(:).*1e6 y(:).*1e6 z(:).*1e6 exx(:) eyy(:) ezz(:) exy(:) exz(:) eyz(:)]; % um
     if exist('stPs','var')
-        files{2,3} = [newfile '\' num2str(StressIntensityFactor) 'MPa_um_Strain_' num2str(stPs) '.mat'];
+        files{2,3} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_um_Strain_' num2str(stPs) '.mat'];
     else
-        files{2,3} = [newfile '\' num2str(StressIntensityFactor) 'MPa_um_Strain.mat'];
+        files{2,3} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_um_Strain.mat'];
     end
     save(files{2,3},'alldata')
     
@@ -162,7 +171,7 @@ Maps.S32_F = e33;     	Maps.S23_F = e33;       Maps.S33_F = e33;
     GrainData.RefPoint.x=0;GrainData.RefPoint.y=0;
     
     MicroscopeData.NROWS = size(ezz,1); MicroscopeData.NCOLS = size(ezz,1); 
-    files{3,3} = [newfile '\' num2str(StressIntensityFactor) 'MPa_um_XEBSD.mat'];
+    files{3,3} = [newfile '\' num2str(StressIntensityFactor(1)) 'MPa_um_XEBSD.mat'];
     Operation{3,3} = 'xED';         unit{3,3}  = 'um';
     save(files{3,3},'Map_RefID','Maps','Data','iPut','GrainData','Data_InputMap',...
         'MicroscopeData')
