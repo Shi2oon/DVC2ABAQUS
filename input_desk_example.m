@@ -13,15 +13,14 @@ MatP.stressstat = Operation{1,2}; % plane stress or strain
 MatP.Mat = 'ferrite'; % materil name (any will do)
 MatP.type = 'E'; % E for istropic linear elastic, A for anistropic with
 % stinfess tensor as input and R for elastic plastic mateirals
-MatP.E = 220e9;  % young's modulus
+MatP.E = 210e9;  % young's modulus
 MatP.nu = 0.3;   % possiov's ratio
 MatP.unique = 'calibration'; % unique name
 
 %% see the error with the crack location in x and y (z not applicable);
 [offset,RadEulerAng,rotCentre,Abaqus,Len] = DVC2J(MatP);% input to abaqus
 % Plot results
-[J{count},KI{count},KII{count},KIII{count},Direction{count}] = ...
-    Plot3DKJ(erase(Abaqus,'.inp'),offset,Len(3,1));
+[J,KI,KII,KIII,Direction] = Plot3DKJ(erase(Abaqus,'.inp'),offset,Len(3,1));
 
 %{
 %%  more details INPUT MATERIAL PROPERTIES AND DATA

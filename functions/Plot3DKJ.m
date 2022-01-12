@@ -144,8 +144,7 @@ OutJ(Kon:end)=[];   KI(Kon:end)=[]; KII(Kon:end)=[];    JK(Kon:end)=[];
 [a,b] = size(J.K.Raw);  A = ceil(a/2); B = ceil(b/2);
 close all; plot(J.K.Raw(A,:)); text(1:b,J.K.Raw(A,:),string([1:b]))
 set(gcf,'position',[98 311 1481 667])
-oh = 11;%input('where to cut the contour? ');               close;
-% oh=10; close
+oh = input('where to cut the contour? ');               close;
 J.Raw = J.Raw(:,1:oh);      KI.Raw = KI.Raw(:,1:oh);  KII.Raw = KII.Raw(:,1:oh);
 J.K.Raw = J.K.Raw(:,1:oh);  KIII.Raw = KIII.Raw(:,1:oh);        
 [saveto,Ond] = fileparts(saveto);
